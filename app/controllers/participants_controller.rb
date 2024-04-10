@@ -1,4 +1,5 @@
 class ParticipantsController < ApplicationController
+    before_action :authenticate_user!
     before_action :set_participant, only: [:show, :update, :destroy]
   
     def index
@@ -34,9 +35,11 @@ class ParticipantsController < ApplicationController
   
     private
   
-      def set_participant
-        @participant = Participant.find(params[:id])
-      end
+    def set_participant
+      @participant = current_user.events.find(params[:event_id]).participants.find(params[:id])
+      rescue ActiveRecord::RecordNotFound
+      render json: { error: "Participant not found" }, status: :not_found
+    end
   
       def participant_params
         params.require(:participant).permit(:first_name, :last_name, :email, :user_id)

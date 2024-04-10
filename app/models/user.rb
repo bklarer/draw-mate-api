@@ -1,8 +1,11 @@
 class User < ApplicationRecord
-    has_many :events
-    has_many :participants
+  # Include default devise modules. Others available are:
+  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
+  include Devise::JWT::RevocationStrategies::JTIMatcher
+
+  devise :database_authenticatable, :registerable, :recoverable, :validatable, :jwt_authenticatable, jwt_revocation_strategy: self
+  has_many :events
+  has_many :participants
     
-    validates :first_name, presence: true
-    validates :last_name, presence: true
-    validates :email, presence: true, uniqueness: true
+  validates :email, presence: true, uniqueness: true
 end
