@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_10_070709) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_10_073837) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -51,6 +51,17 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_10_070709) do
     t.index ["user_id"], name: "index_participants_on_user_id"
   end
 
+  create_table "restrictions", force: :cascade do |t|
+    t.bigint "event_id", null: false
+    t.bigint "participant_id", null: false
+    t.bigint "cannot_give_to_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cannot_give_to_id"], name: "index_restrictions_on_cannot_give_to_id"
+    t.index ["event_id"], name: "index_restrictions_on_event_id"
+    t.index ["participant_id"], name: "index_restrictions_on_participant_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "first_name"
     t.string "last_name"
@@ -65,4 +76,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_10_070709) do
   add_foreign_key "invites", "events"
   add_foreign_key "invites", "participants"
   add_foreign_key "participants", "users"
+  add_foreign_key "restrictions", "events"
+  add_foreign_key "restrictions", "participants"
+  add_foreign_key "restrictions", "participants", column: "cannot_give_to_id"
 end

@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :restrictions
   resources :drawings
   resources :invites, only: [:create, :destroy]
   resources :participants
