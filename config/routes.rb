@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :invites, only: [:create, :destroy]
   resources :participants
   resources :events
   resources :users
