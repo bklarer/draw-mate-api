@@ -1,4 +1,5 @@
 class DrawingsController < ApplicationController
+  before_action :authenticate_user!, except: [:create_fast_draw]
     before_action :set_drawing, only: [:show, :update, :destroy]
     before_action :set_event, only: [:persisted_drawing]
   
@@ -33,7 +34,6 @@ class DrawingsController < ApplicationController
       head :no_content
     end
   
-        # TODO: Make sure auth is disabled
     def create_fast_draw
         participants = params[:participants].map do |p|
             { id: p[:id], restricted_ids: p[:restricted_ids] }
@@ -88,14 +88,20 @@ class DrawingsController < ApplicationController
     private
   
       def set_drawing
-        @drawing = Drawing.find(params[:id])
+        @drawing = current_user_drawings.find_by(id: params[:id])
+        render json: { error: "Drawing not found" }, status: :not_found unless @drawing
       end
 
       def set_event
-        @event = Event.find(params[:event_id])
+        @event = current_user.events.find_by(id: params[:event_id])
+        render json: { error: "Event not found" }, status: :not_found unless @event
       end
 
-      def drawing_params
-        params.require(:drawing).permit(:giver_id, :receiver_id, :event_id)
+      def current_user_drawings
+        Drawing.joins(event: :user).where(events: { user_id: current_user.id })
       end
+
+        def drawing_params
+          params.require(:drawing).permit(:giver_id, :receiver_id, :event_id)
+        end
   end

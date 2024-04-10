@@ -1,7 +1,6 @@
 class EventsController < ApplicationController
+    before_action :authenticate_user!  
     before_action :set_event, only: [:show, :update, :destroy]
-
-    # TODO: Will need to setup current_user once auth is setup
   
     def index
       @events = Event.all
@@ -37,9 +36,11 @@ class EventsController < ApplicationController
   
     private
   
-      def set_event
-        @event = Event.find(params[:id])
-      end
+    def set_event
+      @event = current_user.events.find(params[:id])
+      rescue ActiveRecord::RecordNotFound
+      render json: { error: "Event not found" }, status: :not_found
+    end
   
       def event_params
         params.require(:event).permit(:name, :date, :user_id)
